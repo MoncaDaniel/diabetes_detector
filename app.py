@@ -17,10 +17,10 @@ except Exception as e:
 
 # Prediction function with risk levels
 def predict_diabetes(HighBP, HighChol, CholCheck, BMI, Smoker, Stroke, HeartDiseaseorAttack,
-                     PhysActivity, Fruits, Veggies, HvyAlcoholConsump, GenHlth, DiffWalk):
+                     PhysActivity, Fruits, Veggies, HvyAlcoholConsump, GenHlth, DiffWalk, GeneticPredisposition):
     # Prepare input data for the model
     input_data = np.array([[HighBP, HighChol, CholCheck, BMI, Smoker, Stroke, HeartDiseaseorAttack,
-                            PhysActivity, Fruits, Veggies, HvyAlcoholConsump, GenHlth, DiffWalk]])
+                            PhysActivity, Fruits, Veggies, HvyAlcoholConsump, GenHlth, DiffWalk, GeneticPredisposition]])
     
     # Predict diabetes risk
     prediction = model.predict(input_data)
@@ -62,6 +62,7 @@ with gr.Blocks() as demo:
         HvyAlcoholConsump = gr.Slider(0, 1, step=1, label="Heavy Alcohol Consumption 🍻 - 1 if you have heavy alcohol consumption")
         GenHlth = gr.Slider(1, 5, step=1, label="General Health 🏥 - Rate your general health from 1 (excellent) to 5 (poor)")
         DiffWalk = gr.Slider(0, 1, step=1, label="Difficulty Walking 🚶‍♀️ - 1 if you have difficulty walking")
+        GeneticPredisposition = gr.Slider(0, 1, step=1, label="Genetic Predisposition 🧬 - 1 if you have a family history of diabetes")
 
     gr.Markdown("### Predict Your Diabetes Risk")
     
@@ -74,7 +75,7 @@ with gr.Blocks() as demo:
 
     # Trigger prediction on button click
     submit_btn.click(predict_diabetes, inputs=[HighBP, HighChol, CholCheck, BMI, Smoker, Stroke, HeartDiseaseorAttack,
-                                               PhysActivity, Fruits, Veggies, HvyAlcoholConsump, GenHlth, DiffWalk],
+                                               PhysActivity, Fruits, Veggies, HvyAlcoholConsump, GenHlth, DiffWalk, GeneticPredisposition],
                      outputs=result_output)
 
     # Footer with contact info
