@@ -1,14 +1,19 @@
-import gradio as gr
-import joblib
-import numpy as np
+import os
 import logging
+import joblib
+import gradio as gr
+import numpy as np
 
 # Logging setup
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+logger.info("Starting application")
+logger.info(f"Python version: {os.sys.version}")
+logger.info(f"Installed packages: {os.popen('pip freeze').read()}")
+
+# Load the model
 try:
-    # Load the model
     model = joblib.load("stacking_model.joblib")
     logger.info("Model loaded successfully")
 except Exception as e:
@@ -16,69 +21,79 @@ except Exception as e:
     raise e
 
 # Prediction function with risk levels
-def predict_diabetes(HighBP, HighChol, CholCheck, BMI, Smoker, Stroke, HeartDiseaseorAttack,
-                     PhysActivity, Fruits, Veggies, HvyAlcoholConsump, GenHlth, DiffWalk, GeneticPredisposition):
+def predict_diabetes(GenHlth, HighBP, BMI, HighChol, Age, DiffWalk, PhysHlth, HeartDiseaseorAttack,
+                     Stroke, CholCheck, MentHlth, Smoker, GeneticPredisposition):
     # Prepare input data for the model (13 features as expected)
-    input_data = np.array([[HighBP, HighChol, CholCheck, BMI, Smoker, Stroke, HeartDiseaseorAttack,
-                            PhysActivity, Fruits, Veggies, HvyAlcoholConsump, GenHlth, DiffWalk, GeneticPredisposition]])
+    input_data = np.array([[GenHlth, HighBP, BMI, HighChol, Age, DiffWalk, PhysHlth, HeartDiseaseorAttack,
+                            Stroke, CholCheck, MentHlth, Smoker, GeneticPredisposition]])
     
-    # Predict diabetes risk
+    # Make prediction
     prediction = model.predict(input_data)
-    risk_level = "Low Risk" if prediction[0] == 0 else "Risk" if prediction[0] == 1 else "High Risk"
-    return f"Result: {risk_level} of Diabetes"
+    confidence = model.predict_proba(input_data)[0][1]  # Probability for class 1 (diabetes)
 
-# Gradio app setup with instructions and a friendly interface
+    # Determine risk level based on confidence
+    if confidence >= 0.7:
+        result = "High Risk of Diabetes"
+    elif confidence >= 0.4:
+        result = "Risk of Diabetes"
+    else:
+        result = "Low Risk of Diabetes"
+    
+    return f"Result: {result} - Confidence: {confidence:.2f}"
+
+# Gradio app with instructions and emojis
 with gr.Blocks() as demo:
-    gr.Markdown("<h1 style='text-align: center;'>🩺 Diabetes Risk Prediction App</h1>")
+    gr.Markdown("<h1 style='text-align: center;'>🩺 Diabetes Risk Prediction Tool</h1>")
     gr.Markdown("""
     <div style="text-align: center; font-size: 1.2em; color: #333;">
-    <p>Welcome to the Diabetes Risk Prediction App! This tool estimates your risk of diabetes based on key health indicators.</p>
+    <p>This AI tool estimates your risk of diabetes based on health indicators. It provides a risk assessment but does not replace professional medical advice. 💡</p>
     </div>
-    
+
     ### Instructions for Best Results:
-    1. 📋 **Enter accurate values** for each category to get the most reliable prediction.
-    2. ⚖️ **Maintain a healthy weight** and lifestyle for the best health outcomes.
-    3. 🍏 **Healthy lifestyle choices** are recommended regardless of the prediction.
+    1. 📋 **Fill in each field** accurately to reflect your health indicators.
+    2. 📏 **Check units and ranges** for measurements, such as BMI and age.
+    3. 🚨 **Contact a healthcare provider** if you have concerns about your health.
 
-    ⚠️ **Note**: This tool is for informational purposes only and should not replace professional medical advice.
-    If you have any health concerns, consult a healthcare provider.
+    ⚠️ **Important**: This tool provides risk predictions, not diagnoses. For medical advice, consult a healthcare professional.
 
-    -- Daniel
-    
+    ---
     """)
 
-    # Feature inputs with explanations and emojis
-    with gr.Row():
-        HighBP = gr.Slider(0, 1, step=1, label="High Blood Pressure 🩸 - Indicate 1 if diagnosed with high blood pressure")
-        HighChol = gr.Slider(0, 1, step=1, label="High Cholesterol 🧬 - Indicate 1 if diagnosed with high cholesterol")
-        CholCheck = gr.Slider(0, 1, step=1, label="Cholesterol Check 🩺 - 1 if you had a cholesterol check in the past year")
-        BMI = gr.Slider(12, 94, step=1, label="BMI 📏 - Enter your Body Mass Index")
-        Smoker = gr.Slider(0, 1, step=1, label="Smoker 🚬 - 1 if you currently smoke")
-        Stroke = gr.Slider(0, 1, step=1, label="Stroke 🧠 - 1 if you have had a stroke")
-        HeartDiseaseorAttack = gr.Slider(0, 1, step=1, label="Heart Disease ❤️ - 1 if diagnosed with heart disease or heart attack")
-        PhysActivity = gr.Slider(0, 1, step=1, label="Physical Activity 🏃‍♂️ - 1 if you engage in physical activity")
-        Fruits = gr.Slider(0, 1, step=1, label="Fruits Intake 🍎 - 1 if you eat fruits at least once per day")
-        Veggies = gr.Slider(0, 1, step=1, label="Vegetable Intake 🥦 - 1 if you eat vegetables at least once per day")
-        HvyAlcoholConsump = gr.Slider(0, 1, step=1, label="Heavy Alcohol Consumption 🍻 - 1 if you have heavy alcohol consumption")
-        GenHlth = gr.Slider(1, 5, step=1, label="General Health 🏥 - Rate your general health from 1 (excellent) to 5 (poor)")
-        DiffWalk = gr.Slider(0, 1, step=1, label="Difficulty Walking 🚶‍♀️ - 1 if you have difficulty walking")
-        GeneticPredisposition = gr.Slider(0, 1, step=1, label="Genetic Predisposition 🧬 - 1 if you have family history of diabetes")
+    gr.Markdown("### Input Your Health Indicators")
 
-    gr.Markdown("### Predict Your Diabetes Risk")
-    
-    # Prediction output section
+    # Health indicator inputs
     with gr.Row():
         with gr.Column():
-            submit_btn = gr.Button("🔍 Submit for Analysis")
+            GenHlth = gr.Slider(1, 5, step=1, label="General Health 🏥 (1: Excellent - 5: Poor)")
+            HighBP = gr.Slider(0, 1, step=1, label="High Blood Pressure 🌡️ (0: No, 1: Yes)")
+            BMI = gr.Slider(12, 98, step=1, label="BMI (Body Mass Index) 📊")
+            HighChol = gr.Slider(0, 1, step=1, label="High Cholesterol 🧪 (0: No, 1: Yes)")
+            Age = gr.Slider(18, 100, step=1, label="Age 🎂")
+            DiffWalk = gr.Slider(0, 1, step=1, label="Difficulty Walking 🚶‍♂️ (0: No, 1: Yes)")
+            PhysHlth = gr.Slider(0, 30, step=1, label="Physical Health 🤕 (Number of days unwell)")
+        
         with gr.Column():
-            result_output = gr.Textbox(label="Prediction Result", placeholder="The result will appear here")
+            HeartDiseaseorAttack = gr.Slider(0, 1, step=1, label="Heart Disease or Attack ❤️ (0: No, 1: Yes)")
+            Stroke = gr.Slider(0, 1, step=1, label="Stroke 🧠 (0: No, 1: Yes)")
+            CholCheck = gr.Slider(0, 1, step=1, label="Cholesterol Check ✅ (0: No, 1: Yes)")
+            MentHlth = gr.Slider(0, 30, step=1, label="Mental Health 🧘‍♂️ (Number of days unwell)")
+            Smoker = gr.Slider(0, 1, step=1, label="Smoker 🚬 (0: No, 1: Yes)")
+            GeneticPredisposition = gr.Slider(0, 1, step=1, label="Genetic Predisposition 🧬 (0: No, 1: Yes)")
 
-    # Trigger prediction on button click
-    submit_btn.click(predict_diabetes, inputs=[HighBP, HighChol, CholCheck, BMI, Smoker, Stroke, HeartDiseaseorAttack,
-                                               PhysActivity, Fruits, Veggies, HvyAlcoholConsump, GenHlth, DiffWalk, GeneticPredisposition],
-                     outputs=result_output)
+    # Prediction button and output
+    with gr.Row():
+        submit_btn = gr.Button("🔍 Submit for Risk Prediction")
+        result_output = gr.Textbox(label="Risk Prediction Result", placeholder="The result will appear here")
 
-    # Footer with contact info
+    # Link button click to prediction function
+    submit_btn.click(
+        predict_diabetes,
+        inputs=[GenHlth, HighBP, BMI, HighChol, Age, DiffWalk, PhysHlth, HeartDiseaseorAttack,
+                Stroke, CholCheck, MentHlth, Smoker, GeneticPredisposition],
+        outputs=result_output
+    )
+
+    # Footer with contact information
     gr.Markdown("""
     ---
     <p style="text-align: center; font-size: 16px;">
