@@ -103,4 +103,4 @@ with gr.Blocks() as demo:
     """)
 
 # Launch the Gradio app
-demo.launch(True)
+demo.launch(share=True)
