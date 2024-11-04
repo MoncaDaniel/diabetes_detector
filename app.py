@@ -4,7 +4,8 @@ import numpy as np
 import joblib
 
 # Load the pre-trained model
-model = joblib.load("best_model.pkl")  # Ensure the path is correct
+model = joblib.load("stacking_model.joblib")  # Ensure the path is correct
+
 
 # Define feature columns based on your dataset
 FEATURE_COLUMNS = [
