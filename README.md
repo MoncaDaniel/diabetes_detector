@@ -30,10 +30,17 @@ Since the dataset lacked genetic predisposition data, synthetic data was generat
 ## Model Performance
 The model uses a stacking ensemble approach that combines several classifiers to improve prediction accuracy. Key components of the ensemble include logistic regression, decision tree, random forest, and gradient boosting. **Summary of performance metrics**:
 
-- **Accuracy**: *(placeholder for final accuracy score)*
-- **Precision**: *(placeholder for final precision score)*
-- **Recall**: *(placeholder for final recall score)*
-- **F1 Score**: *(placeholder for final F1 score)*
+Stacking Model Cross-Validation Score: 0.84487922652635
+Stacking Model Test Accuracy: 0.8393530743115806
+Stacking Model Classification Report:
+               precision    recall  f1-score   support
+
+         0.0       0.82      0.86      0.84     10481
+         1.0       0.86      0.82      0.84     10727
+
+    accuracy                           0.84     21208
+   macro avg       0.84      0.84      0.84     21208
+weighted avg       0.84      0.84      0.84     21208
 
 These metrics indicate the model’s ability to correctly identify diabetes cases while minimizing false positives.
 
