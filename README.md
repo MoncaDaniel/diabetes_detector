@@ -54,5 +54,5 @@ To set up the project and run the model, follow these steps:
 ### Installation
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/diabetes-prediction.git
+   git clone https://github.com/MoncaDaniel/diabetes-prediction.git
    cd diabetes-prediction
