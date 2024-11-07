@@ -6,6 +6,7 @@
 - [Model Performance](#model-performance)
 - [Quick Start](#quick-start)
 - [Instructions for Use](#instructions-for-use)
+- [Documentation](#documentation)
 
 ## Introduction
 This project is a machine learning model designed to predict the likelihood of diabetes based on health indicators. Leveraging a clean, balanced dataset, the model provides a robust risk assessment for diabetes and prediabetes. This application aims to assist healthcare professionals and individuals in identifying early risk factors, allowing for preventive action.
@@ -30,17 +31,16 @@ Since the dataset lacked genetic predisposition data, synthetic data was generat
 ## Model Performance
 The model uses a stacking ensemble approach that combines several classifiers to improve prediction accuracy. Key components of the ensemble include logistic regression, decision tree, random forest, and gradient boosting. **Summary of performance metrics**:
 
-Stacking Model Cross-Validation Score: 0.84487922652635
-Stacking Model Test Accuracy: 0.8393530743115806
-Stacking Model Classification Report:
-               precision    recall  f1-score   support
+- **Cross-Validation Score**: 0.8449
+- **Test Accuracy**: 0.8394
 
-         0.0       0.82      0.86      0.84     10481
-         1.0       0.86      0.82      0.84     10727
+### Classification Report
 
-    accuracy                           0.84     21208
-   macro avg       0.84      0.84      0.84     21208
-weighted avg       0.84      0.84      0.84     21208
+| Metric       | Class 0 (No Diabetes) | Class 1 (Diabetes) |
+|--------------|------------------------|---------------------|
+| Precision    | 0.82                  | 0.86               |
+| Recall       | 0.86                  | 0.82               |
+| F1 Score     | 0.84                  | 0.84               |
 
 These metrics indicate the model’s ability to correctly identify diabetes cases while minimizing false positives.
 
