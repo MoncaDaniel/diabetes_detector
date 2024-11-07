@@ -52,5 +52,4 @@ To prepare the data for modeling, several preprocessing steps were implemented:
 ### Summary
 The dataset was prepared with several essential transformations to ensure optimal model training. By focusing on features relevant to diabetes risk and incorporating synthetic genetic data, the dataset provides a solid foundation for building a reliable predictive model.
 
-For further details on data handling and processing, refer to the code comments in `data_preprocessing.py`.
 
